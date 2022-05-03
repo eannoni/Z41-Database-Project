@@ -113,14 +113,60 @@ class Welcome:
 
 ##### ----------------- DEVELOPER -----------------
 class Developer:
+
     def menu(id):
+        # TODO: Use id to get Name from Developer record tuple
+
         clear_frame()
         Label(frame, text="Developer Menu").pack()
-        Label(frame, text="Welcome, Developer " + id).pack()
+        Label(frame, text="Welcome, Developer " + id).pack() #TODO: Replace id with Name
+
+        # Update available rolls button
+        Button(frame, text="Update Available Rolls", command=lambda: Developer.updateAvalRolls(id)).pack()
+
+        # View orders button
+        Button(frame, text="View Orders", command=lambda: Developer.viewOrders(id)).pack()
+
         # Back button
         Button(frame, text="Back", command=Welcome.welcome).pack()
+
         # Quit button
         Button(frame, text="Quit", command=root.quit).pack()
+
+
+    def updateAvalRolls(id):
+        clear_frame()
+        Label(frame, text="Update Available Rolls").pack()
+
+        # Back button
+        Button(frame, text="Back", command=lambda: Developer.menu(id)).pack()
+
+
+    def viewOrders(id):
+
+        # ------ View Order Helper Functions ------
+        def showOrders(id):
+            if dropSelection.get() == "All Orders":
+                print("showing all orders")
+                # TODO: show all dev's order with given tuple
+            else: #current orders
+                print("showing current orders")
+                # TODO: show current dev's order with given tuple
+
+        # ------ View Order Page ------
+        clear_frame()
+        Label(frame, text="View Orders").pack()
+
+        # View Option Drop Down
+        dropSelection = StringVar()
+        dropSelection.set("All Orders") #set default dropdown selection
+        drop = OptionMenu(frame, dropSelection, "All Orders", "Current Orders").pack()
+
+        # View button (for the selected view type)
+        Button(frame, text="View", command=lambda: showOrders(id)).pack()
+
+        # Back button
+        Button(frame, text="Back", command=lambda: Developer.menu(id)).pack()
 
 
 
