@@ -1,4 +1,7 @@
 from tkinter import *
+from query import query
+from database import database
+import sys
 
 root = Tk()
 root.title("Z41 Demo")
@@ -45,7 +48,7 @@ class Welcome:
 
     def is_valid_developer_id(id):
         # TODO: RUN QUERY
-        return True
+        return query.checkValidDeveloperID(mydb, mycursor, id)
 
 
     ##### Welcome functions for Customer
@@ -78,7 +81,8 @@ class Welcome:
 
     def is_valid_customer_id(id):
         # TODO: RUN QUERY
-        return True
+        return query.checkValidCustomerID(mydb, mycursor, id)
+        
 
     def new_customer():
         clear_frame()
@@ -107,7 +111,9 @@ class Welcome:
     def create_new_customer(name, email, address):
         # TODO: RUN QUERY TO CREATE RECORD
         # TODO: RUN QUERY TO GET ID OF NEW RECORD
-        return 1001 # TODO: RETURN ACTUAL ID
+        #return 1001 # TODO: RETURN ACTUAL ID
+        return query.createNewCustomerAndGetID(mydb, mycursor, name, email, address) # returns ID of new customer
+
 
 
 
@@ -185,6 +191,17 @@ class Customer:
 
 ##### ----------------- MAIN PROGRAM -----------------
 
+argv = sys.argv #store command line arguments
+if len(argv) < 3:#ensure there are at least 3 command line arguments 
+    print("Username and then password should be input as command line arguments for MySQL.")
+    sys.exit()#quit the executable 
+
+
+list = database.startDB(argv[1], argv[2])
+mydb = list[0]
+mycursor = list[1]
+
+
 # header
 Label(root, text="Z41 Database App", font="Arial 32 bold").pack()
 
@@ -195,3 +212,5 @@ frame.pack(side="top", padx=10, pady=10, fill="both")
 # display welcome
 Welcome.welcome()
 root.mainloop()
+
+database.endDB(mydb)
