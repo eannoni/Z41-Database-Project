@@ -51,16 +51,16 @@ class query:
 
     def updateCustomerAttributes(mydb, mycursor, id, name, email, address):
         query = '''
-        UPDATE TABLE Customer(Name, Email, Address)
-        SET Name = ''' + "'" + name + "'" + "AND Email = '" + email + "' AND Address = '" + address + "'" + '''
+        UPDATE Customer
+        SET Name = ''' + "'" + name + "'" + ", Email = '" + email + "', Address = '" + address + "'" + '''
         WHERE CustomerID = ''' + str(id) + ";"
         mycursor.execute(query)
         mydb.commit()
     
     def updateDeveloperAttributes(mydb, mycursor, id, name, email, address):
         query = '''
-        UPDATE TABLE Developer(Name, Email, Address)
-        SET Name = ''' + "'" + name + "'" + "AND Email = '" + email + "' AND Address = '" + address + "'" + '''
+        UPDATE Developer
+        SET Name = ''' + "'" + name + "'" + ", Email = '" + email + "', Address = '" + address + "'" + '''
         WHERE DeveloperID = ''' + str(id) + ";"
         mycursor.execute(query)
         mydb.commit()
@@ -79,3 +79,61 @@ class query:
         WHERE DeveloperID = ''' + str(id) + ";"
         mycursor.execute(query)
         return mycursor.fetchone()
+
+    # UNTESTED
+    def updateDevelopersAvailableRolls(mydb, mycursor, id, value):
+        query = '''
+        UPDATE Developer 
+        SET AvailableRolls = ''' + str(value) + '''
+        WHERE DeveloperID = ''' + str(id) + ";"
+        mycursor.execute(query)
+        mydb.commit()
+
+    # UNTESTED
+    def updateOrderStatus(mydb, mycursor, id, status):
+        query = '''
+        UPDATE FilmOrder
+        SET Status = ''' + str(status) + '''
+        WHERE OrderID = ''' + str(id) + ";"
+        mycursor.execute(query)
+        mydb.commit()
+
+    # UNTESTED
+    def updateOrderLink(mydb, mycursor, id, link):
+        query = '''
+        UPDATE FilmOrder
+        SET Link = ''' + str(link) + '''
+        WHERE OrderID = ''' + str(id) + ";"
+        mycursor.execute(query)
+        mydb.commit()
+
+    # UNTESTED
+    def getAllDeveloperTuples(mydb, mycursor):
+        query = '''SELECT * FROM Developer;'''
+        mycursor.execute(query)
+        return mycursor.fetchall()
+
+    # UNTESTED
+    def getAllProductTuples(mydb, mycursor):
+        query = '''SELECT * FROM Product;'''
+        mycursor.execute(query)
+        return mycursor.fetchall()
+
+    # UNTESTED
+    def decrementAvailableRollsForDeveloper(mydb, mycursor, id, rollsToRemove):
+        mycursor.execute("SELECT AvailableRolls FROM Developer WHERE DeveloperID = " + str(id) + ";")
+        count = mycursor.fetchone()[0]
+        result = count - rollsToRemove
+        query = '''UPDATE Developer
+        SET AvailableRolls = ''' + str(result) + '''
+        WHERE DeveloperID = ''' + str(id) + ";"
+        mycursor.execute(query)
+        mydb.commit()
+
+    # UNTESTED
+    def createOrder(mydb, mycursor, custID, devID, status, datePlaced, Quantity, Price):
+        query = '''
+        INSERT INTO FilmOrder(CustomerID, DeveloperID, Status, DatePlaced, Quantity, Price)
+        VALUES(''' + str(custID) + ", " + str(devID) + ", '" + str(status) + "', '" + str(datePlaced) + "', " + str(Quantity) + ", " + str(Price) + ");"
+        mycursor.execute(query)
+        mydb.commit()

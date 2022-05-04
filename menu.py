@@ -1,5 +1,8 @@
+# tkinter imports
 from tkinter import *
 from tkinter import messagebox
+from tkinter import ttk
+
 from query import query
 from database import database
 import sys
@@ -229,6 +232,45 @@ class Customer:
         clear_frame()
         # Display header
         Label(frame, text="View Store").pack()
+
+        # ------------ SET UP TREE -----------------
+        # # Create treeview frame
+        # tree_frame = Frame(root)
+        # tree_frame.pack(pady=10)
+
+        # # Create treeview scrollbar
+        # tree_scroll = Scrollbar(tree_frame)
+        # tree_scroll.pack(side=RIGHT, fill=Y)
+
+        # # Create treeview
+        # my_tree = ttk.Treeview(tree_frame, yscrollcommand=tree_scroll.set, selectmode="extended")
+        # my_tree.pack()
+
+        # # Configure Scrollbar
+        # tree_scroll.config(command=my_tree.yview)
+
+        # # Define our columns
+        # my_tree['columns'] = ("Name", "ID", "Favorite Pizza")
+
+        # # Format our columns
+        # my_tree.column("#0", width=0, stretch=NO)
+        # my_tree.column("Name", anchor=W, width=120)
+        # my_tree.column("ID", anchor=CENTER, width=80)
+        # my_tree.column("Favorite Pizza", anchor=W, width=120)
+
+        # # Create headings
+        # # my_tree.heading("#0", text="")
+        # my_tree.heading("Name", text="Name", anchor=W)
+        # my_tree.heading("ID", text="ID", anchor=CENTER)
+        # my_tree.heading("Favorite Pizza", text="Favorite Pizza", anchor=W)
+        # ------------------------------------------
+
+        #TODO: QUERY TO GET ALL PRODUCTS
+        products = [
+            [1001, "z41 Zine", "Magazine thingy", 20.00],
+            [1002, "16mm Roll", "New film roll", 15.00],
+            [1002, "8mm Roll", "A different film roll", 12.00]
+        ]
         # Back button
         Button(frame, text="Back", command=lambda: Customer.menu(Customer.id)).pack()
         # Quit button
@@ -267,12 +309,12 @@ class Customer:
 
         # called when Save button is clicked. Checks if id is valid
         def on_save_button_click():
-            # TODO: error handling for empty/incorrect fields
-            # TODO: RUN QUERY TO UPDATE RECORD
             # save locally
             Customer.name = e_name.get()
             Customer.email = e_email.get()
             Customer.address = e_address.get()
+            # run query to update record in db
+            query.updateCustomerAttributes(mydb, mycursor, Customer.id, Customer.name, Customer.email, Customer.address)
             # display success message
             messagebox.showinfo("Update Account", "Account information successfully updated.")
             Customer.menu(Customer.id)
@@ -304,11 +346,9 @@ if len(argv) < 3:#ensure there are at least 3 command line arguments
     print("Username and then password should be input as command line arguments for MySQL.")
     sys.exit()#quit the executable 
 
-
 list = database.startDB(argv[1], argv[2])
 mydb = list[0]
 mycursor = list[1]
-
 
 # header
 Label(root, text="Z41 Database App", font="Arial 32 bold").pack()
