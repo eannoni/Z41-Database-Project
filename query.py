@@ -144,7 +144,6 @@ class query:
         mycursor.execute(query)
         mydb.commit()
 
-    # UNTESTED
     def getPurchaseHistory(mydb, mycursor, custID):
         query = '''
         SELECT Date, Name, Quantity, Price
@@ -155,7 +154,6 @@ class query:
         mycursor.execute(query)
         return mycursor.fetchall()
 
-    # UNTESTED
     def getOrderHistory(mydb, mycursor, custID):
         query = '''
         SELECT Developer.Name, Quantity, Price, DatePlaced, DateDelivered, Link
@@ -163,5 +161,21 @@ class query:
         INNER JOIN Developer
         ON FilmOrder.DeveloperID = Developer.DeveloperID
         WHERE CustomerID = ''' + str(custID) + " ORDER BY FilmOrder.DatePlaced DESC;"
+        mycursor.execute(query)
+        return mycursor.fetchall()
+    
+    def getAllPremiumCustomers(mydb, mycursor):
+        query = '''
+        SELECT Name, TotalSpent
+        FROM (
+            SELECT Customer.CustomerID, Customer.Name, SUM(Product.Price * Purchase.Quantity) AS TotalSpent
+            FROM Customer
+            INNER JOIN Purchase
+            ON Customer.CustomerID = Purchase.CustomerID
+            INNER JOIN Product
+            ON Purchase.ProductID = Product.ProductID
+            GROUP BY CustomerID
+            HAVING SUM(Product.Price * Purchase.Quantity) >= 100
+        ) AS PremiumCustomers;'''
         mycursor.execute(query)
         return mycursor.fetchall()

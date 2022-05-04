@@ -22,6 +22,20 @@ def clear_frame():
 def get_curr_datetime():
     return time.strftime('%Y-%m-%d %H:%M:%S')
 
+# helper function for initializing trees
+def get_initialized_tree(tree_frame):
+    # Create treeview scrollbar
+    tree_scroll = Scrollbar(tree_frame)
+    tree_scroll.pack(side=RIGHT, fill=Y)
+
+    # Create treeview
+    my_tree = ttk.Treeview(tree_frame, yscrollcommand=tree_scroll.set, selectmode="extended")
+
+    # Configure Scrollbar
+    tree_scroll.config(command=my_tree.yview)
+
+    return my_tree
+
 
 
 ##### ----------------- WELCOME -----------------
@@ -32,6 +46,8 @@ class Welcome:
         Label(frame, text="Are you a Developer or a Customer?").pack()
         Button(frame, text="Developer", command=Welcome.developer).pack()
         Button(frame, text="Customer", command=Welcome.customer).pack()
+        # View Premium Customers (Premium is purchase total of > $100)
+        Button(frame, text="View Premium Customers", command=Welcome.view_premium_customers).pack()
         # Quit button
         Button(frame, text="Quit", command=root.quit).pack()
 
@@ -115,13 +131,47 @@ class Welcome:
         # Back button
         Button(frame, text="Back", command=Welcome.customer).pack()
 
-    # TODO: move to query file
     def create_new_customer(name, email, address):
-        # TODO: RUN QUERY TO CREATE RECORD
-        # TODO: RUN QUERY TO GET ID OF NEW RECORD
-        #return 1001 # TODO: RETURN ACTUAL ID
+        # run query to create new customer in db
         return query.createNewCustomerAndGetID(mydb, mycursor, name, email, address) # returns ID of new customer
 
+    # View Premium Customers (Premium is purchase total of > $100)
+    def view_premium_customers():
+        clear_frame()
+        Label(frame, text="Premium Customers").pack()
+        Label(frame, text="Below are customers that have spent $100 or more on Purchases.\nThese are the kinds of people you want to be friends with.").pack()
+
+        # ------------ SET UP TREE -----------------
+        # Create treeview frame
+        tree_frame = Frame(frame)
+        tree_frame.pack(pady=10)
+
+        my_tree = get_initialized_tree(tree_frame)
+        my_tree.pack()
+
+        # Define our columns
+        my_tree['columns'] = ("Name", "TotalSpent")
+
+        # Format our columns
+        my_tree.column("#0", width=0, stretch=NO)
+        my_tree.column("Name", anchor=W, width=150)
+        my_tree.column("TotalSpent", anchor=CENTER, width=80)
+
+        # Create headings
+        my_tree.heading("Name", text="Customer Name", anchor=W)
+        my_tree.heading("TotalSpent", text="Total Spent", anchor=CENTER)
+        # ------------------------------------------
+
+        # query to get all premium customer tuples from db in format (name, totalSpent)
+        premium_customer_data = query.getAllPremiumCustomers(mydb, mycursor)
+        # Add data to tree
+        i = 0
+        for record in premium_customer_data:
+            my_tree.insert(parent='', index='end', iid=i, values=(premium_customer_data[i][0], "$"+str(premium_customer_data[i][1])))
+            i+=1
+
+        # Back button
+        Button(frame, text="Back", command=Welcome.welcome).pack()
 
 
 
@@ -292,17 +342,10 @@ class Customer:
         # clear tree frame before adding data
         for widgets in tree_frame.winfo_children():
             widgets.destroy()
+
         # ------------ SET UP TREE -----------------
-        # Create treeview scrollbar
-        tree_scroll = Scrollbar(tree_frame)
-        tree_scroll.pack(side=RIGHT, fill=Y)
-
-        # Create treeview
-        my_tree = ttk.Treeview(tree_frame, yscrollcommand=tree_scroll.set, selectmode="extended")
+        my_tree = get_initialized_tree(tree_frame)
         my_tree.pack()
-
-        # Configure Scrollbar
-        tree_scroll.config(command=my_tree.yview)
 
         # Define our columns
         my_tree['columns'] = ("Date", "Name", "Quantity", "TotalPrice")
@@ -335,17 +378,10 @@ class Customer:
         # clear tree frame before adding data
         for widgets in tree_frame.winfo_children():
             widgets.destroy()
+
         # ------------ SET UP TREE -----------------
-        # Create treeview scrollbar
-        tree_scroll = Scrollbar(tree_frame)
-        tree_scroll.pack(side=RIGHT, fill=Y)
-
-        # Create treeview
-        my_tree = ttk.Treeview(tree_frame, yscrollcommand=tree_scroll.set, selectmode="extended")
+        my_tree = get_initialized_tree(tree_frame)
         my_tree.pack()
-
-        # Configure Scrollbar
-        tree_scroll.config(command=my_tree.yview)
 
         # Define our columns
         my_tree['columns'] = ("DevName", "Quantity", "TotalPrice", "DatePlaced", "DateDelivered", "Link")
@@ -387,16 +423,8 @@ class Customer:
         tree_frame = Frame(frame)
         tree_frame.pack(pady=10)
 
-        # Create treeview scrollbar
-        tree_scroll = Scrollbar(tree_frame)
-        tree_scroll.pack(side=RIGHT, fill=Y)
-
-        # Create treeview
-        my_tree = ttk.Treeview(tree_frame, yscrollcommand=tree_scroll.set, selectmode="extended")
+        my_tree = get_initialized_tree(tree_frame)
         my_tree.pack()
-
-        # Configure Scrollbar
-        tree_scroll.config(command=my_tree.yview)
 
         # Define our columns
         my_tree['columns'] = ("Name", "Description", "Price")
