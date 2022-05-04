@@ -121,39 +121,74 @@ class Welcome:
 
 ##### ----------------- DEVELOPER -----------------
 class Developer:
+    id = -1
+    name = ""
+    email = ""
+    address = ""
+    availRolls = -1
 
     def menu(id):
-        # TODO: Use id to get Name from Developer record tuple
-
         clear_frame()
+
+        # query customer info from db and store info locally
+        developer_info_tuple = query.getDeveloperAttributes(mydb, mycursor, str(id))
+        (Developer.id, Developer.name, Developer.email, Developer.address, Developer.availRolls) = developer_info_tuple
+
+        # Display info
         Label(frame, text="Developer Menu").pack()
-        Label(frame, text="Welcome, Developer " + id).pack() #TODO: Replace id with Name
+        Label(frame, text="Welcome, "+Developer.name).pack()
+        Label(frame, text="ID: "+str(Developer.id)).pack()
+        Label(frame, text="Name: "+Developer.name).pack()
+        Label(frame, text="Address: "+Developer.address).pack()
+        Label(frame, text="Available Rolls: "+str(Developer.availRolls)).pack()
 
         # Update available rolls button
-        Button(frame, text="Update Available Rolls", command=lambda: Developer.updateAvalRolls(id)).pack()
-
+        Button(frame, text="Update Available Rolls", command=Developer.updateAvailRolls).pack()
         # View orders button
-        Button(frame, text="View Orders", command=lambda: Developer.viewOrders(id)).pack()
+        Button(frame, text="View Orders", command=Developer.viewOrders).pack()
 
         # Back button
         Button(frame, text="Back", command=Welcome.welcome).pack()
-
         # Quit button
         Button(frame, text="Quit", command=root.quit).pack()
 
 
-    def updateAvalRolls(id):
+    def updateAvailRolls():
         clear_frame()
+
+        # ------ Update Avail Rolls Helper Functions ------
+        def modAvailRolls(modAmt):
+            # Update local class
+            Developer.availRolls += modAmt
+            if Developer.availRolls < 0: #prevents negative val and instead sets to 0
+                Developer.availRolls = 0
+
+            # Update DB
+            query.updateDeveloperAttributes(mydb, mycursor, Developer.id, Developer.name, Developer.email, Developer.address, Developer.availRolls)
+
+        # ------ Update Avail Rolls Page ------
         Label(frame, text="Update Available Rolls").pack()
+        Label(frame, text="Current Available Rolls: " + str(Developer.availRolls)).pack()
+
+        # Change available rolls slider
+        modScale = Scale(frame, from_=1, to=50, orient=HORIZONTAL)
+        modScale.pack()
+
+        # Add button
+        Button(frame, text="Add", command=lambda: modAvailRolls(modScale.get())).pack()
+
+        # Subtract button
+        Button(frame, text="Subtract", command=lambda: modAvailRolls(modScale.get() * -1)).pack()
 
         # Back button
-        Button(frame, text="Back", command=lambda: Developer.menu(id)).pack()
+        Button(frame, text="Back", command=lambda: Developer.menu(Developer.id)).pack()
 
 
-    def viewOrders(id):
+    def viewOrders():
+        clear_frame()
 
         # ------ View Order Helper Functions ------
-        def showOrders(id):
+        def showOrders():
             if dropSelection.get() == "All Orders":
                 print("showing all orders")
                 # TODO: show all dev's order with given tuple
@@ -162,7 +197,6 @@ class Developer:
                 # TODO: show current dev's order with given tuple
 
         # ------ View Order Page ------
-        clear_frame()
         Label(frame, text="View Orders").pack()
 
         # View Option Drop Down
@@ -171,10 +205,10 @@ class Developer:
         drop = OptionMenu(frame, dropSelection, "All Orders", "Current Orders").pack()
 
         # View button (for the selected view type)
-        Button(frame, text="View", command=lambda: showOrders(id)).pack()
+        Button(frame, text="View", command=showOrders).pack()
 
         # Back button
-        Button(frame, text="Back", command=lambda: Developer.menu(id)).pack()
+        Button(frame, text="Back", command=lambda: Developer.menu(Developer.id)).pack()
 
 
 
