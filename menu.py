@@ -262,17 +262,125 @@ class Customer:
         clear_frame()
         # Display header
         Label(frame, text="View History").pack()
-        print("Customer ID: ", Customer.id)
+        # views purchase history or order history, user selects which one
+
+        # define variable to hold selected value
+        option = IntVar()
+        option.set("Purchases")
+        # create radiobuttons
+        Radiobutton(frame, text="Purchases", variable=option, value=0).pack(anchor=W)
+        Radiobutton(frame, text="Orders", variable=option, value=1).pack(anchor=W)
+
+        def on_go_button_clicked():
+            choice = option.get()
+            if choice == 0:
+                Customer.view_purchase_history(tree_frame)
+            else:
+                Customer.view_order_history(tree_frame)
+
+        myButton = Button(frame, text="Go", command=on_go_button_clicked)
+        myButton.pack()
+        # Create treeview frame
+        tree_frame = Frame(frame)
+        tree_frame.pack(pady=10)
         # Back button
         Button(frame, text="Back", command=lambda: Customer.menu(Customer.id)).pack()
         # Quit button
         Button(frame, text="Quit", command=root.quit).pack()
 
+    def view_purchase_history(tree_frame):
+        # clear tree frame before adding data
+        for widgets in tree_frame.winfo_children():
+            widgets.destroy()
+        # ------------ SET UP TREE -----------------
+        # Create treeview scrollbar
+        tree_scroll = Scrollbar(tree_frame)
+        tree_scroll.pack(side=RIGHT, fill=Y)
+
+        # Create treeview
+        my_tree = ttk.Treeview(tree_frame, yscrollcommand=tree_scroll.set, selectmode="extended")
+        my_tree.pack()
+
+        # Configure Scrollbar
+        tree_scroll.config(command=my_tree.yview)
+
+        # Define our columns
+        my_tree['columns'] = ("Date", "Name", "Quantity", "TotalPrice")
+
+        # Format our columns
+        my_tree.column("#0", width=0, stretch=NO)
+        my_tree.column("Date", anchor=W, width=140)
+        my_tree.column("Name", anchor=W, width=250)
+        my_tree.column("Quantity", anchor=CENTER, width=60)
+        my_tree.column("TotalPrice", anchor=CENTER, width=70)
+
+        # Create headings
+        my_tree.heading("Date", text="Date Purchased", anchor=W)
+        my_tree.heading("Name", text="Product Name", anchor=W)
+        my_tree.heading("Quantity", text="Quantity", anchor=CENTER)
+        my_tree.heading("TotalPrice", text="Total Price", anchor=CENTER)
+        # ------------------------------------------
+
+        # query to get all product tuples from db in format (date, name, quantity, price)
+        purchase_data = query.getPurchaseHistory(mydb, mycursor, Customer.id)
+        # Add data to tree
+        i = 0
+        for record in purchase_data:
+            # total price = quantity * price
+            total_price = record[2] * record[3]
+            my_tree.insert(parent='', index='end', iid=i, values=(purchase_data[i][0], purchase_data[i][1], purchase_data[i][2], "$"+str(total_price)))
+            i+=1
+    
+    def view_order_history(tree_frame):
+        # clear tree frame before adding data
+        for widgets in tree_frame.winfo_children():
+            widgets.destroy()
+        # ------------ SET UP TREE -----------------
+        # Create treeview scrollbar
+        tree_scroll = Scrollbar(tree_frame)
+        tree_scroll.pack(side=RIGHT, fill=Y)
+
+        # Create treeview
+        my_tree = ttk.Treeview(tree_frame, yscrollcommand=tree_scroll.set, selectmode="extended")
+        my_tree.pack()
+
+        # Configure Scrollbar
+        tree_scroll.config(command=my_tree.yview)
+
+        # Define our columns
+        my_tree['columns'] = ("DevName", "Quantity", "TotalPrice", "DatePlaced", "DateDelivered", "Link")
+
+        # Format our columns
+        my_tree.column("#0", width=0, stretch=NO)
+        my_tree.column("DevName", anchor=W, width=150)
+        my_tree.column("Quantity", anchor=CENTER, width=60)
+        my_tree.column("TotalPrice", anchor=CENTER, width=70)
+        my_tree.column("DatePlaced", anchor=W, width=140)
+        my_tree.column("DateDelivered", anchor=W, width=140)
+        my_tree.column("Link", anchor=W, width=200)
+
+        # Create headings
+        my_tree.heading("DevName", text="Developer", anchor=W)
+        my_tree.heading("Quantity", text="# Rolls", anchor=CENTER)
+        my_tree.heading("TotalPrice", text="Total Price", anchor=CENTER)
+        my_tree.heading("DatePlaced", text="Date Placed", anchor=W)
+        my_tree.heading("DateDelivered", text="Date Delivered", anchor=W)
+        my_tree.heading("Link", text="Link to Photos", anchor=W)
+        # ------------------------------------------
+
+        # query to get all order tuples from db in format (developer name, quantity, price, date placed, date delivered, link)
+        order_data = query.getOrderHistory(mydb, mycursor, Customer.id)
+        # Add data to tree
+        i = 0
+        for record in order_data:
+            my_tree.insert(parent='', index='end', iid=i, values=order_data[i])
+            i+=1
+
     def view_store():
         clear_frame()
         # Display header
         Label(frame, text="View Store").pack()
-        Label(frame, text="Select a product above and click the Purchase button to purchase.").pack()
+        Label(frame, text="Select a product below and click the Purchase button to purchase.").pack()
 
         # ------------ SET UP TREE -----------------
         # Create treeview frame
@@ -310,10 +418,10 @@ class Customer:
         # Add data to tree
         i = 0
         for record in product_data:
-            my_tree.insert(parent='', index='end', iid=i, values=(product_data[i][1], product_data[i][2], product_data[i][3]))
+            my_tree.insert(parent='', index='end', iid=i, values=(product_data[i][1], product_data[i][2], "$"+str(product_data[i][3])))
             i+=1
         # quantity slider
-        quantity_slider = Scale(frame, from_=1, to=20, orient=HORIZONTAL)
+        quantity_slider = Scale(frame, from_=1, to=20, orient=HORIZONTAL, length=200)
         quantity_slider.pack()
 
         # purchase product function triggered by purchase button

@@ -143,3 +143,25 @@ class query:
         VALUES(''' + str(custID) + ", " + str(prodID) + ", '" + date + "', " + str(quantity) + ");"
         mycursor.execute(query)
         mydb.commit()
+
+    # UNTESTED
+    def getPurchaseHistory(mydb, mycursor, custID):
+        query = '''
+        SELECT Date, Name, Quantity, Price
+        FROM Purchase
+        INNER JOIN Product
+        ON Purchase.ProductID = Product.ProductID
+        WHERE CustomerID = ''' + str(custID) + " ORDER BY Purchase.Date DESC;"
+        mycursor.execute(query)
+        return mycursor.fetchall()
+
+    # UNTESTED
+    def getOrderHistory(mydb, mycursor, custID):
+        query = '''
+        SELECT Developer.Name, Quantity, Price, DatePlaced, DateDelivered, Link
+        FROM FilmOrder
+        INNER JOIN Developer
+        ON FilmOrder.DeveloperID = Developer.DeveloperID
+        WHERE CustomerID = ''' + str(custID) + " ORDER BY FilmOrder.DatePlaced DESC;"
+        mycursor.execute(query)
+        return mycursor.fetchall()
