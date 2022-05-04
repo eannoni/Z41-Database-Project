@@ -131,7 +131,7 @@ class database:
 
 #######################################################################################################
 ########### THE REST OF THE CODE IS FOR TESTING AND MAKING IT STANDALONE, DELETE LATER ###############
-
+'''
 argv = sys.argv #store command line arguments
 if len(argv) < 3:#ensure there are at least 3 command line arguments 
     print("Username and then password should be input as command line arguments for MySQL.")
@@ -139,8 +139,9 @@ if len(argv) < 3:#ensure there are at least 3 command line arguments
 
 #this tests the return status of startDB
 list = database.startDB(argv[1], argv[2])
-'''
-print(list[0])
-print(list[1])
-'''
+
+# print(list[0])
+# print(list[1])
+
 database.endDB(list[0])
+'''

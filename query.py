@@ -33,14 +33,49 @@ class query:
         mycursor.execute(query)
         mydb.commit()
         query2 = '''
-        SELECT CustomerID 
-        FROM Customer
-        WHERE Name = '''
-        query2 += "\'" + name + "\' AND Email = \'" + email + "\' AND Address = \'" + address + "\';"
+        SELECT LAST_INSERT_ID() 
+        FROM Customer;'''
         mycursor.execute(query2)
-        return mycursor.fetchone()[0]
+        return mycursor.fetchall()[0][0]
 
-    # TODO: take in ID and return tuple of attributes belonging to the customer
     def getCustomerAttributes(mydb, mycursor, id):
         # add query here
+        query = '''
+        SELECT CustomerID, Name, Email, Address
+        FROM Customer
+        WHERE CustomerID = '''
+        query += str(id) + ";"
+        mycursor.execute(query)
+        return mycursor.fetchone()
+        
+
+    def updateCustomerAttributes(mydb, mycursor, id, name, email, address):
+        query = '''
+        UPDATE TABLE Customer(Name, Email, Address)
+        SET Name = ''' + "'" + name + "'" + "AND Email = '" + email + "' AND Address = '" + address + "'" + '''
+        WHERE CustomerID = ''' + id + ";"
+        mycursor.execute(query)
+        mydb.commit()
+    
+    def updateDeveloperAttributes(mydb, mycursor, id, name, email, address):
+        query = '''
+        UPDATE TABLE Developer(Name, Email, Address)
+        SET Name = ''' + "'" + name + "'" + "AND Email = '" + email + "' AND Address = '" + address + "'" + '''
+        WHERE DeveloperID = ''' + id + ";"
+        mycursor.execute(query)
+        mydb.commit()
+
+    def deleteCustomer(mydb, mycursor, id):
+        query = '''
+        DELETE FROM Customer
+        WHERE CustomerID = ''' + id + ";"
+        mycursor.execute(query)
+        mydb.commit()
+
+    def getDeveloperAttributes(mydb, mycursor, id):
+        query = '''
+        SELECT DeveloperID, Name, Email, Address, AvailableRolls
+        FROM Developer
+        WHERE DeveloperID = ''' + id + ";"
+        mycursor.execute(query)
         return mycursor.fetchone()

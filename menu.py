@@ -219,7 +219,7 @@ class Customer:
         clear_frame()
         # Display header
         Label(frame, text="View History").pack()
-        print("Customer ID: " + Customer.id)
+        print("Customer ID: ", Customer.id)
         # Back button
         Button(frame, text="Back", command=lambda: Customer.menu(Customer.id)).pack()
         # Quit button
@@ -321,4 +321,5 @@ frame.pack(side="top", padx=10, pady=10, fill="both")
 Welcome.welcome()
 root.mainloop()
 
+print("Closing the database connection")
 database.endDB(mydb)
