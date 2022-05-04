@@ -29,13 +29,18 @@ class query:
         query = '''
         INSERT INTO Customer(Name, Email, Address) 
         VALUES ('''
-        query += name + ", " + email + ", " + address + ");"
+        query += "\'" + name + "\', \'" + email + "\', \'" + address + "\');"
         mycursor.execute(query)
         mydb.commit()
         query2 = '''
         SELECT CustomerID 
         FROM Customer
         WHERE Name = '''
-        query2 += name + " AND Email = " + email + " AND Address = " + address + ";"
+        query2 += "\'" + name + "\' AND Email = \'" + email + "\' AND Address = \'" + address + "\';"
         mycursor.execute(query2)
         return mycursor.fetchone()[0]
+
+    # TODO: take in ID and return tuple of attributes belonging to the customer
+    def getCustomerAttributes(mydb, mycursor, id):
+        # add query here
+        return mycursor.fetchone()

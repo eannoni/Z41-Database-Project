@@ -1,4 +1,5 @@
 from tkinter import *
+from tkinter import messagebox
 from query import query
 from database import database
 import sys
@@ -47,7 +48,6 @@ class Welcome:
         Button(frame, text="Back", command=Welcome.welcome).pack()
 
     def is_valid_developer_id(id):
-        # TODO: RUN QUERY
         return query.checkValidDeveloperID(mydb, mycursor, id)
 
 
@@ -80,7 +80,6 @@ class Welcome:
         Button(frame, text="Back", command=Welcome.customer).pack()
 
     def is_valid_customer_id(id):
-        # TODO: RUN QUERY
         return query.checkValidCustomerID(mydb, mycursor, id)
         
 
@@ -178,14 +177,123 @@ class Developer:
 
 ##### ----------------- CUSTOMER -----------------
 class Customer:
+    id = -1
+    name = ""
+    email = ""
+    address = ""
+
     def menu(id):
         clear_frame()
+        
+        # query customer info from db
+        customer_info_tuple = query.getCustomerAttributes(mydb, mycursor, id)
+        # store info locally
+        (Customer.id, Customer.name, Customer.email, Customer.address) = customer_info_tuple
+
+        # Display info
         Label(frame, text="Customer Menu").pack()
-        Label(frame, text="Welcome, Customer " + str(id)).pack()
+        Label(frame, text="Welcome, "+Customer.name).pack()
+        Label(frame, text="ID: "+str(Customer.id)).pack()
+        Label(frame, text="Name: "+Customer.name).pack()
+        Label(frame, text="Address: "+Customer.address).pack()
+
+        # Display options
+        Label(frame, text="Options").pack()
+        # View History
+        Button(frame, text="View History", command=Customer.view_history).pack()
+        # View Store
+        Button(frame, text="View Store", command=Customer.view_store).pack()
+        # Place Order
+        Button(frame, text="Place Order", command=Customer.place_order).pack()
+        # Update Account Info
+        Button(frame, text="Update Account Info", command=Customer.update_account).pack()
+        # Delete Account
+        Button(frame, text="Delete Account", command=Customer.delete_account).pack()
+
         # Back button
         Button(frame, text="Back", command=Welcome.welcome).pack()
         # Quit button
         Button(frame, text="Quit", command=root.quit).pack()
+
+    def view_history():
+        clear_frame()
+        # Display header
+        Label(frame, text="View History").pack()
+        print("Customer ID: " + Customer.id)
+        # Back button
+        Button(frame, text="Back", command=lambda: Customer.menu(Customer.id)).pack()
+        # Quit button
+        Button(frame, text="Quit", command=root.quit).pack()
+
+    def view_store():
+        clear_frame()
+        # Display header
+        Label(frame, text="View Store").pack()
+        # Back button
+        Button(frame, text="Back", command=lambda: Customer.menu(Customer.id)).pack()
+        # Quit button
+        Button(frame, text="Quit", command=root.quit).pack()
+
+    def place_order():
+        clear_frame()
+        # Display header
+        Label(frame, text="Place Order").pack()
+        # Back button
+        Button(frame, text="Back", command=lambda: Customer.menu(Customer.id)).pack()
+        # Quit button
+        Button(frame, text="Quit", command=root.quit).pack()
+
+    def update_account():
+        clear_frame()
+        # Display header
+        Label(frame, text="Update Account Info").pack()
+
+        # Display entry fields
+        # Name
+        Label(frame, text="First and Last Name").pack()
+        e_name = Entry(frame, width=50)
+        e_name.pack()
+        e_name.insert(0, Customer.name)
+        # Email
+        Label(frame, text="Email").pack()
+        e_email = Entry(frame, width=50)
+        e_email.pack()
+        e_email.insert(0, Customer.email)
+        # Address
+        Label(frame, text="Address").pack()
+        e_address = Entry(frame, width=50)
+        e_address.pack()
+        e_address.insert(0, Customer.address)
+
+        # called when Save button is clicked. Checks if id is valid
+        def on_save_button_click():
+            # TODO: error handling for empty/incorrect fields
+            # TODO: RUN QUERY TO UPDATE RECORD
+            # save locally
+            Customer.name = e_name.get()
+            Customer.email = e_email.get()
+            Customer.address = e_address.get()
+            # display success message
+            messagebox.showinfo("Update Account", "Account information successfully updated.")
+            Customer.menu(Customer.id)
+        # Go button
+        Button(frame, text="Save", command=on_save_button_click).pack()
+
+        # Back button
+        Button(frame, text="Back", command=lambda: Customer.menu(Customer.id)).pack()
+        # Quit button
+        Button(frame, text="Quit", command=root.quit).pack()
+
+    def delete_account():
+        # open pop-up window
+        response = messagebox.askyesno("Delete Account", "Are you sure you would like to delete this account? This action cannot be undone.")
+        if response == 1:
+            #TODO: RUN QUERY TO DELETE ACCOUNT
+            messagebox.showinfo("Delete Account", "Account successfully deleted.")
+            Welcome.welcome()
+
+
+
 
 
 
