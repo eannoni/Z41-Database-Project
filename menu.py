@@ -5,7 +5,9 @@ from tkinter import ttk
 
 from query import query
 from database import database
+
 import sys
+import time
 
 root = Tk()
 root.title("Z41 Demo")
@@ -15,6 +17,10 @@ root.geometry("800x500")
 def clear_frame():
    for widgets in frame.winfo_children():
       widgets.destroy()
+
+# returns current datetime in sql format
+def get_curr_datetime():
+    return time.strftime('%Y-%m-%d %H:%M:%S')
 
 
 
@@ -44,7 +50,7 @@ class Welcome:
             if Welcome.is_valid_developer_id(id):
                 Developer.menu(id)
             else:
-                Label(frame, text="Could not locate Developer ID", fg="red").pack()
+                messagebox.showerror("Developer Login", "Could not locate Developer with ID #" + str(id) + ".")
         # Go button
         Button(frame, text="Go", command=on_go_button_click).pack()
         # Back button
@@ -76,7 +82,7 @@ class Welcome:
             if Welcome.is_valid_customer_id(id):
                 Customer.menu(id)
             else:
-                Label(frame, text="Could not locate Customer ID", fg="red").pack()
+                messagebox.showerror("Customer Login", "Could not locate Customer with ID #" + str(id) + ".")
         # Go button
         Button(frame, text="Go", command=on_go_button_click).pack()
         # Back button
@@ -131,7 +137,7 @@ class Developer:
         clear_frame()
 
         # query customer info from db and store info locally
-        developer_info_tuple = query.getDeveloperAttributes(mydb, mycursor, str(id))
+        developer_info_tuple = query.getDeveloperAttributes(mydb, mycursor, id)
         (Developer.id, Developer.name, Developer.email, Developer.address, Developer.availRolls) = developer_info_tuple
 
         # Display info
@@ -266,45 +272,68 @@ class Customer:
         clear_frame()
         # Display header
         Label(frame, text="View Store").pack()
+        Label(frame, text="Select a product above and click the Purchase button to purchase.").pack()
 
         # ------------ SET UP TREE -----------------
-        # # Create treeview frame
-        # tree_frame = Frame(root)
-        # tree_frame.pack(pady=10)
+        # Create treeview frame
+        tree_frame = Frame(frame)
+        tree_frame.pack(pady=10)
 
-        # # Create treeview scrollbar
-        # tree_scroll = Scrollbar(tree_frame)
-        # tree_scroll.pack(side=RIGHT, fill=Y)
+        # Create treeview scrollbar
+        tree_scroll = Scrollbar(tree_frame)
+        tree_scroll.pack(side=RIGHT, fill=Y)
 
-        # # Create treeview
-        # my_tree = ttk.Treeview(tree_frame, yscrollcommand=tree_scroll.set, selectmode="extended")
-        # my_tree.pack()
+        # Create treeview
+        my_tree = ttk.Treeview(tree_frame, yscrollcommand=tree_scroll.set, selectmode="extended")
+        my_tree.pack()
 
-        # # Configure Scrollbar
-        # tree_scroll.config(command=my_tree.yview)
+        # Configure Scrollbar
+        tree_scroll.config(command=my_tree.yview)
 
-        # # Define our columns
-        # my_tree['columns'] = ("Name", "ID", "Favorite Pizza")
+        # Define our columns
+        my_tree['columns'] = ("Name", "Description", "Price")
 
-        # # Format our columns
-        # my_tree.column("#0", width=0, stretch=NO)
-        # my_tree.column("Name", anchor=W, width=120)
-        # my_tree.column("ID", anchor=CENTER, width=80)
-        # my_tree.column("Favorite Pizza", anchor=W, width=120)
+        # Format our columns
+        my_tree.column("#0", width=0, stretch=NO)
+        my_tree.column("Name", anchor=W, width=250)
+        my_tree.column("Description", anchor=W, width=400)
+        my_tree.column("Price", anchor=CENTER, width=60)
 
-        # # Create headings
-        # # my_tree.heading("#0", text="")
-        # my_tree.heading("Name", text="Name", anchor=W)
-        # my_tree.heading("ID", text="ID", anchor=CENTER)
-        # my_tree.heading("Favorite Pizza", text="Favorite Pizza", anchor=W)
+        # Create headings
+        my_tree.heading("Name", text="Product Name", anchor=W)
+        my_tree.heading("Description", text="Description", anchor=W)
+        my_tree.heading("Price", text="Price", anchor=CENTER)
         # ------------------------------------------
 
-        #TODO: QUERY TO GET ALL PRODUCTS
-        products = [
-            [1001, "z41 Zine", "Magazine thingy", 20.00],
-            [1002, "16mm Roll", "New film roll", 15.00],
-            [1002, "8mm Roll", "A different film roll", 12.00]
-        ]
+        # query to get all product tuples from db
+        product_data = query.getAllProductTuples(mydb, mycursor)
+        # Add data to tree
+        i = 0
+        for record in product_data:
+            my_tree.insert(parent='', index='end', iid=i, values=(product_data[i][1], product_data[i][2], product_data[i][3]))
+            i+=1
+        # quantity slider
+        quantity_slider = Scale(frame, from_=1, to=20, orient=HORIZONTAL)
+        quantity_slider.pack()
+
+        # purchase product function triggered by purchase button
+        def purchase_product():
+            selection = my_tree.selection()
+            if len(selection) == 0:
+                messagebox.showerror("Product Purchase", "No product selected. Please select a product before purchasing.")
+                return
+            # get product_tuple from selection
+            product_tuple = product_data[int(selection[0])]
+            product_id = product_tuple[0]
+            quantity = quantity_slider.get()
+            decision = messagebox.askyesno("Product Purchase", "Are you sure you would like to purchase " + str(quantity) + " of item \"" + product_tuple[1] + "\"?")
+            if decision:
+                # query to create purchase in db
+                query.createPurchase(mydb, mycursor, Customer.id, product_id, get_curr_datetime(), quantity)
+                messagebox.showinfo("Product Purchase", "Successfully purchased " + str(quantity) + " of item \"" + product_tuple[1] + "\".")
+
+        # Purchase button
+        Button(frame, text="Purchase Item", command=purchase_product).pack()
         # Back button
         Button(frame, text="Back", command=lambda: Customer.menu(Customer.id)).pack()
         # Quit button

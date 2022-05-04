@@ -113,7 +113,6 @@ class query:
         mycursor.execute(query)
         return mycursor.fetchall()
 
-    # UNTESTED
     def getAllProductTuples(mydb, mycursor):
         query = '''SELECT * FROM Product;'''
         mycursor.execute(query)
@@ -135,5 +134,12 @@ class query:
         query = '''
         INSERT INTO FilmOrder(CustomerID, DeveloperID, Status, DatePlaced, Quantity, Price)
         VALUES(''' + str(custID) + ", " + str(devID) + ", '" + str(status) + "', '" + str(datePlaced) + "', " + str(Quantity) + ", " + str(Price) + ");"
+        mycursor.execute(query)
+        mydb.commit()
+
+    def createPurchase(mydb, mycursor, custID, prodID, date, quantity):
+        query = '''
+        INSERT INTO Purchase(CustomerID, ProductID, Date, Quantity)
+        VALUES(''' + str(custID) + ", " + str(prodID) + ", '" + date + "', " + str(quantity) + ");"
         mycursor.execute(query)
         mydb.commit()
