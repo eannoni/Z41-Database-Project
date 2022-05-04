@@ -184,7 +184,7 @@ class Customer:
 
     def menu(id):
         clear_frame()
-        
+
         # query customer info from db
         customer_info_tuple = query.getCustomerAttributes(mydb, mycursor, id)
         # store info locally
@@ -288,7 +288,7 @@ class Customer:
         # open pop-up window
         response = messagebox.askyesno("Delete Account", "Are you sure you would like to delete this account? This action cannot be undone.")
         if response == 1:
-            #TODO: RUN QUERY TO DELETE ACCOUNT
+            query.deleteCustomer(mydb, mycursor, Customer.id)
             messagebox.showinfo("Delete Account", "Account successfully deleted.")
             Welcome.welcome()
 

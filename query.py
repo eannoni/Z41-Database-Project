@@ -53,7 +53,7 @@ class query:
         query = '''
         UPDATE TABLE Customer(Name, Email, Address)
         SET Name = ''' + "'" + name + "'" + "AND Email = '" + email + "' AND Address = '" + address + "'" + '''
-        WHERE CustomerID = ''' + id + ";"
+        WHERE CustomerID = ''' + str(id) + ";"
         mycursor.execute(query)
         mydb.commit()
     
@@ -61,14 +61,14 @@ class query:
         query = '''
         UPDATE TABLE Developer(Name, Email, Address)
         SET Name = ''' + "'" + name + "'" + "AND Email = '" + email + "' AND Address = '" + address + "'" + '''
-        WHERE DeveloperID = ''' + id + ";"
+        WHERE DeveloperID = ''' + str(id) + ";"
         mycursor.execute(query)
         mydb.commit()
 
     def deleteCustomer(mydb, mycursor, id):
         query = '''
         DELETE FROM Customer
-        WHERE CustomerID = ''' + id + ";"
+        WHERE CustomerID = ''' + str(id) + ";"
         mycursor.execute(query)
         mydb.commit()
 
@@ -76,6 +76,6 @@ class query:
         query = '''
         SELECT DeveloperID, Name, Email, Address, AvailableRolls
         FROM Developer
-        WHERE DeveloperID = ''' + id + ";"
+        WHERE DeveloperID = ''' + str(id) + ";"
         mycursor.execute(query)
         return mycursor.fetchone()
