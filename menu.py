@@ -175,6 +175,7 @@ class Welcome:
 
 
 
+
 ##### ----------------- DEVELOPER -----------------
 class Developer:
     id = -1
@@ -215,16 +216,20 @@ class Developer:
         # ------ Update Avail Rolls Helper Functions ------
         def modAvailRolls(modAmt):
             # Update local class
-            Developer.availRolls += modAmt
-            if Developer.availRolls < 0: #prevents negative val and instead sets to 0
+            if Developer.availRolls + modAmt >= 0:
+                Developer.availRolls += modAmt
+            else: # sets to 0 instead of negative number
                 Developer.availRolls = 0
 
-            # Update DB
-            query.updateDeveloperAttributes(mydb, mycursor, Developer.id, Developer.name, Developer.email, Developer.address, Developer.availRolls)
+            # Update database
+            query.updateDevelopersAvailableRolls(mydb, mycursor, Developer.id, Developer.availRolls)
+            # Update widgit label
+            currRolls.config(text="Current Available Rolls: " + str(Developer.availRolls))
 
         # ------ Update Avail Rolls Page ------
         Label(frame, text="Update Available Rolls").pack()
-        Label(frame, text="Current Available Rolls: " + str(Developer.availRolls)).pack()
+        currRolls = Label(frame, text="Current Available Rolls: " + str(Developer.availRolls))
+        currRolls.pack()
 
         # Change available rolls slider
         modScale = Scale(frame, from_=1, to=50, orient=HORIZONTAL)
@@ -244,27 +249,76 @@ class Developer:
         clear_frame()
 
         # ------ View Order Helper Functions ------
-        def showOrders():
-            if dropSelection.get() == "All Orders":
-                print("showing all orders")
-                # TODO: show all dev's order with given tuple
-            else: #current orders
-                print("showing current orders")
-                # TODO: show current dev's order with given tuple
+        def goOnClick():
+            choice = option.get()
+            if choice == 0:
+                # Customer.view_purchase_history(tree_frame)
+                viewAllOrders(tree_frame)
+            else:
+                # Customer.view_order_history(tree_frame)
+                print("woof")
+
+        def viewAllOrders(tree_frame):
+            # Clear treee frame before adding data
+            for widgets in tree_frame.winfo_children():
+                widgets.destroy()
+
+            # ---- SET UP TREE ----
+            my_tree = get_initialized_tree(tree_frame)
+            my_tree.pack()
+
+            # Define our columns
+            my_tree['columns'] = ("DatePlaced", "DateDelivered", "DeveloperName", "Quantity", "Price", "Link")
+
+            # Format our columns
+            my_tree.column("DatePlaced", anchor=CENTER, width=140)
+            my_tree.column("DateDelivered", anchor=CENTER, width=140)
+            my_tree.column("#0", width=0, stretch=NO)
+            my_tree.column("DeveloperName", anchor=W, width=250)
+            my_tree.column("Quantity", anchor=CENTER, width=60)
+            my_tree.column("Price", anchor=CENTER, width=70)
+            my_tree.column("Link", anchor=CENTER, width=350)
+
+            # Create headings
+            my_tree.heading("DatePlaced", text="Date Placed", anchor=CENTER)
+            my_tree.heading("DateDelivered", text="Date Delivered", anchor=CENTER)
+            my_tree.heading("DeveloperName", text="Developer Name", anchor=CENTER)
+            my_tree.heading("Quantity", text="Quantity", anchor=CENTER)
+            my_tree.heading("Price", text="Total Price", anchor=CENTER)
+            my_tree.heading("Link", text="Link", anchor=W)
+
+            # Query to get all product tuples from db in format (date, name, quantity, price)
+            orderData = query.getOrderHistory(mydb, mycursor, Customer.id)
+            
+            # Add data to tree
+            i = 0
+            for record in orderData:
+                # total price = quantity * price
+                totalPrice = record[1] * record[2]
+                my_tree.insert(parent='', index='end', iid=i, values=(orderData[i][3], orderData[i][4],orderData[i][0], orderData[i][1], "$"+str(totalPrice),  orderData[i][5]))
+                i+=1
+
 
         # ------ View Order Page ------
         Label(frame, text="View Orders").pack()
 
-        # View Option Drop Down
-        dropSelection = StringVar()
-        dropSelection.set("All Orders") #set default dropdown selection
-        drop = OptionMenu(frame, dropSelection, "All Orders", "Current Orders").pack()
+         # Radio buttons
+        option = IntVar()
+        option.set("All Orders")
+        Radiobutton(frame, text="All Orders", variable=option, value=0).pack(anchor=CENTER)
+        Radiobutton(frame, text="Current Orders", variable=option, value=1).pack(anchor=CENTER)
 
-        # View button (for the selected view type)
-        Button(frame, text="View", command=showOrders).pack()
+        # View button
+        viewOrderType = Button(frame, text="View", command=goOnClick)
+        viewOrderType.pack()
+
+        # Create treeview frame
+        tree_frame = Frame(frame)
+        tree_frame.pack(pady=10)
 
         # Back button
         Button(frame, text="Back", command=lambda: Developer.menu(Developer.id)).pack()
+
 
 
 
