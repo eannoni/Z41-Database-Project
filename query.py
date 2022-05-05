@@ -166,6 +166,17 @@ class query:
         mycursor.execute(query)
         return mycursor.fetchall()
     
+    def getCurrentOrders(mydb, mycursor, custID):
+        query = '''
+        SELECT Developer.Name, Quantity, Price, DatePlaced, DateDelivered, Link
+        FROM FilmOrder
+        INNER JOIN Developer
+        ON FilmOrder.DeveloperID = Developer.DeveloperID
+        WHERE CustomerID = ''' + str(custID) + "AND Status!= 'SENT' " +
+        "ORDER BY FilmOrder.DatePlaced DESC;"
+        mycursor.execute(query)
+        return mycursor.fetchall()
+
     def getAllPremiumCustomers(mydb, mycursor):
         query = '''
         SELECT Name, TotalSpent
