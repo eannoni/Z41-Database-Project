@@ -535,30 +535,22 @@ class Customer:
         Label(frame, text="Place Order").pack()
         Label(frame, text="Enter number of rolls you would like to have developed. Then select Find Developers.\nThen choose a developer and select Place Order.").pack()
 
-        # quantity slider
-        num_rolls_slider = Scale(frame, from_=1, to=10, orient=HORIZONTAL)
-        num_rolls_slider.pack()
-        # stores value of num_rolls. Only updated when Find Developers button is clicked
-        num_rolls = IntVar()
-        num_rolls.set(num_rolls_slider.get())
-
-        # called by find developers button, refreshes tree with developers with enough available rolls
-        def refresh_developer_tree():
-            # update num_rolls value
-            num_rolls.set(num_rolls_slider.get())
+        # called on slider value change, refreshes tree with developers with enough available rolls
+        def refresh_developer_tree(num_rolls):
             # clear all items in tree
             for item in my_tree.get_children():
                 my_tree.delete(item)
             # query to get all product tuples from db
-            developer_data = query.getAllDeveloperTuplesWithEnoughAvailableRolls(mydb, mycursor, num_rolls.get())
+            developer_data = query.getAllDeveloperTuplesWithEnoughAvailableRolls(mydb, mycursor, num_rolls)
             # Add data to tree
             i = 0
             for record in developer_data:
                 my_tree.insert(parent='', index='end', iid=i, values=(record[1], record[2], record[3], str(record[4])))
                 i+=1
 
-        # Find developers button
-        Button(frame, text="Find Developers", command=refresh_developer_tree).pack()
+        # quantity slider
+        num_rolls_slider = Scale(frame, from_=1, to=10, orient=HORIZONTAL, command=refresh_developer_tree)
+        num_rolls_slider.pack()
 
         # Create treeview frame
         tree_frame = Frame(frame)
@@ -580,9 +572,13 @@ class Customer:
         my_tree.heading("Address", text="Developer Address", anchor=W)
         my_tree.heading("AvailRolls", text="Available Rolls", anchor=CENTER)
 
+        # initially fill developer tree with default 1 roll
+        refresh_developer_tree(1)
+
         # places order with selected developer
         def place_order():
-            developer_data = query.getAllDeveloperTuplesWithEnoughAvailableRolls(mydb, mycursor, num_rolls.get())
+            quantity = num_rolls_slider.get()
+            developer_data = query.getAllDeveloperTuplesWithEnoughAvailableRolls(mydb, mycursor, quantity)
             selection = my_tree.selection()
             if len(selection) == 0:
                 messagebox.showerror("Place Order", "No developer selected. Please select a developer before placing order.")
@@ -591,16 +587,17 @@ class Customer:
             developer_tuple = developer_data[int(selection[0])]
             developer_id = developer_tuple[0]
             # cost of a roll is $10
-            total_cost = num_rolls.get() * 10.00
-            decision = messagebox.askyesno("Product Purchase", "Are you sure you would like to have " + str(num_rolls.get()) + "roll(s) developed by " + developer_tuple[1] + " for $" + str(total_cost) + "?")
+            total_cost = quantity * 10.00
+            cost_str = ("%.2f" % total_cost)
+            decision = messagebox.askyesno("Product Purchase", "Are you sure you would like to have " + str(quantity) + " roll(s) developed by " + developer_tuple[1] + " for $" + cost_str + "?")
             if decision:
                 # query to decrement available rolls for developer in db
-                query.decrementAvailableRollsForDeveloper(mydb, mycursor, developer_id, num_rolls.get())
+                query.decrementAvailableRollsForDeveloper(mydb, mycursor, developer_id, quantity)
                 # query to create order in db
-                query.createOrder(mydb, mycursor, Customer.id, developer_id, get_curr_datetime(), num_rolls.get(), total_cost)
+                query.createOrder(mydb, mycursor, Customer.id, developer_id, get_curr_datetime(), quantity, total_cost)
                 # refresh developer tree view
-                refresh_developer_tree()
-                messagebox.showinfo("Product Purchase", "Successfully placed order for " + str(num_rolls.get()) + "roll(s) developed by " + developer_tuple[1] + " for $" + str(total_cost) + ".")
+                refresh_developer_tree(quantity)
+                messagebox.showinfo("Product Purchase", "Successfully placed order for " + str(quantity) + " roll(s) developed by " + developer_tuple[1] + " for $" + cost_str + ".")
 
 
 
