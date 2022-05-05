@@ -76,7 +76,7 @@ class database:
                         ''',
             "Developer": '''
                         INSERT INTO Developer(Name, Email, Address, AvailableRolls) VALUES("Curren Taber", "ctaber@chapman.edu", "1 University Drive Orange, CA 92866", 5),
-                                                                                        ("Scott Fitzpatrick", "sfitzpatrick@chapman.edu", "915 E Katella Ave Anaheim, CA 92805", 28)
+                                                                                        ("Scott Fitzpatrick", "sfitzpatrick@chapman.edu", "915 E Katella Ave Anaheim, CA 92805", 28),
                                                                                         ("Rene German", "german@chapman.edu", "Steak and Lobster Ln Orange, CA 92805", 12);
                         ''', 
             "Product": '''
