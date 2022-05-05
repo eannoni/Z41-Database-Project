@@ -107,9 +107,11 @@ class query:
         mycursor.execute(query)
         mydb.commit()
 
-    # UNTESTED
-    def getAllDeveloperTuples(mydb, mycursor):
-        query = '''SELECT * FROM Developer;'''
+    def getAllDeveloperTuplesWithEnoughAvailableRolls(mydb, mycursor, numRolls):
+        query = '''
+        SELECT *
+        FROM Developer
+        WHERE AvailableRolls >= ''' + str(numRolls) + ";"
         mycursor.execute(query)
         return mycursor.fetchall()
 
@@ -130,10 +132,10 @@ class query:
         mydb.commit()
 
     # UNTESTED
-    def createOrder(mydb, mycursor, custID, devID, status, datePlaced, Quantity, Price):
+    def createOrder(mydb, mycursor, custID, devID, datePlaced, Quantity, Price):
         query = '''
         INSERT INTO FilmOrder(CustomerID, DeveloperID, Status, DatePlaced, Quantity, Price)
-        VALUES(''' + str(custID) + ", " + str(devID) + ", '" + str(status) + "', '" + str(datePlaced) + "', " + str(Quantity) + ", " + str(Price) + ");"
+        VALUES(''' + str(custID) + ", " + str(devID) + ", 'PENDING', '" + str(datePlaced) + "', " + str(Quantity) + ", " + str(Price) + ");"
         mycursor.execute(query)
         mydb.commit()
 
