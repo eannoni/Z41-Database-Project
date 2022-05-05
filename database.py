@@ -71,20 +71,28 @@ class database:
         tables = {
             "Customer": '''
                         INSERT INTO Customer(Name, Email, Address) VALUES("Eli Annoni", "annoni@chapman.edu", "1 University Drive Orange, CA 92866"),
-                                                                        ("Ian Hakeman", "hakeman@chapman.edu", "1 University Drive Orange, CA 92866");
+                                                                        ("Ian Hakeman", "hakeman@chapman.edu", "1 University Drive Orange, CA 92866"),
+                                                                        ("Sierra Clibourne", "clibourne@chapman.edu", "420 Cool Person Drive Orange, CA 92866");
                         ''',
             "Developer": '''
                         INSERT INTO Developer(Name, Email, Address, AvailableRolls) VALUES("Curren Taber", "ctaber@chapman.edu", "1 University Drive Orange, CA 92866", 5),
-                                                                                        ("Scott Fitzpatrick", "sfitzpatrick@chapman.edu", "915 E Katella Ave Anaheim, CA 92805", 28);
+                                                                                        ("Scott Fitzpatrick", "sfitzpatrick@chapman.edu", "915 E Katella Ave Anaheim, CA 92805", 28)
+                                                                                        ("Rene German", "german@chapman.edu", "Steak and Lobster Ln Orange, CA 92805", 12);
                         ''', 
             "Product": '''
-                        INSERT INTO Product(Name, Description, Price) VALUES("Zine41: Winter - Limited Print", NULL, 20.00), ("Liford HP65 35mm 36 Exposure Roll", "35mm film", 7.00);
+                        INSERT INTO Product(Name, Description, Price) VALUES("Zine41: Winter - Limited Print", NULL, 20.00),
+                                                                            ("Liford HP65 35mm 36 Exposure Roll", "35mm film", 7.00),
+                                                                            ("Harman EZ35 Reusable Film Camera", "Reusable, motorized camera", 55.00);
             ''',
             "Purchase": '''
-                        INSERT INTO Purchase(CustomerID, ProductID, Date, Quantity) VALUES(1, 2, "2022-03-12 08:40:20", 6), (2, 1, "2022-04-29 14:05:07", 3);
+                        INSERT INTO Purchase(CustomerID, ProductID, Date, Quantity) VALUES(1, 2, "2022-03-12 08:40:20", 6),
+                                                                                        (2, 1, "2022-04-29 14:05:07", 3),
+                                                                                        (2, 3, "2022-02-06 12:23:16", 1);
             ''', 
             "FilmOrder": '''
-                        INSERT INTO FilmOrder(CustomerID, DeveloperID, Status, DatePlaced, DateDelivered, Link, Quantity, Price) VALUES(1, 2, "Complete", "2022-02-19 08:32:01", "2022-03-01 18:43:23", "www.chapman.edu", 16, 160.00), (2, 1, "In Progress", "2022-04-27 05:24:17", NULL, NULL, 5, 50.00);
+                        INSERT INTO FilmOrder(CustomerID, DeveloperID, Status, DatePlaced, DateDelivered, Link, Quantity, Price) VALUES(1, 2, "SENT", "2022-02-19 08:32:01", "2022-03-01 18:43:23", "https://we.tl/t-PqU2FqsXzF", 8, 80.00),
+                                                                                                                                        (2, 1, "RECEIVED", "2022-02-03 07:14:19", NULL, NULL, 5, 50.00),
+                                                                                                                                        (2, 3, "DEVELOPED", "2022-04-27 03:52:52", NULL, NULL, 2, 20.00);
             '''
         } 
         #loop through the dictionary and see if tables are empty, if so, run the insert queries
