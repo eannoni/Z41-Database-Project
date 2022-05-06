@@ -252,13 +252,11 @@ class Developer:
         def goOnClick():
             choice = option.get()
             if choice == 0:
-                # Customer.view_purchase_history(tree_frame)
-                viewAllOrders(tree_frame)
+                displayOrders(tree_frame, False)
             else:
-                # Customer.view_order_history(tree_frame)
-                print("woof")
+                displayOrders(tree_frame, True)
 
-        def viewAllOrders(tree_frame):
+        def displayOrders(tree_frame, currentOrders):
             # Clear treee frame before adding data
             for widgets in tree_frame.winfo_children():
                 widgets.destroy()
@@ -288,7 +286,10 @@ class Developer:
             my_tree.heading("Link", text="Link", anchor=W)
 
             # Query to get all product tuples from db in format (date, name, quantity, price)
-            orderData = query.getOrderHistory(mydb, mycursor, Customer.id)
+            if currentOrders == True:
+                orderData = query.getCurrentOrders(mydb, mycursor, Customer.id)
+            else:
+                orderData = query.getOrderHistory(mydb, mycursor, Customer.id)
             
             # Add data to tree
             i = 0
@@ -297,7 +298,6 @@ class Developer:
                 totalPrice = record[1] * record[2]
                 my_tree.insert(parent='', index='end', iid=i, values=(orderData[i][3], orderData[i][4],orderData[i][0], orderData[i][1], "$"+str(totalPrice),  orderData[i][5]))
                 i+=1
-
 
         # ------ View Order Page ------
         Label(frame, text="View Orders").pack()

@@ -172,7 +172,7 @@ class query:
         FROM FilmOrder
         INNER JOIN Developer
         ON FilmOrder.DeveloperID = Developer.DeveloperID
-        WHERE CustomerID = ''' + str(custID) + "AND Status!= 'SENT' " + "ORDER BY FilmOrder.DatePlaced DESC;"
+        WHERE CustomerID = ''' + str(custID) + " AND FilmOrder.Status != 'SENT' ORDER BY FilmOrder.DatePlaced DESC;"
         mycursor.execute(query)
         return mycursor.fetchall()
 
