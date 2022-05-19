@@ -438,7 +438,7 @@ class Customer:
         my_tree.pack()
 
         # Define our columns
-        my_tree['columns'] = ("DevName", "Quantity", "TotalPrice", "DatePlaced", "DateDelivered", "Link")
+        my_tree['columns'] = ("DevName", "Quantity", "TotalPrice", "DatePlaced", "DateDelivered", "OrderStatus", "Link")
 
         # Format our columns
         my_tree.column("#0", width=0, stretch=NO)
@@ -447,6 +447,7 @@ class Customer:
         my_tree.column("TotalPrice", anchor=CENTER, width=70)
         my_tree.column("DatePlaced", anchor=W, width=140)
         my_tree.column("DateDelivered", anchor=W, width=140)
+        my_tree.column("OrderStatus", anchor=W, width=140)
         my_tree.column("Link", anchor=W, width=200)
 
         # Create headings
@@ -455,15 +456,16 @@ class Customer:
         my_tree.heading("TotalPrice", text="Total Price", anchor=CENTER)
         my_tree.heading("DatePlaced", text="Date Placed", anchor=W)
         my_tree.heading("DateDelivered", text="Date Delivered", anchor=W)
+        my_tree.heading("OrderStatus", text="Order Status", anchor=W)
         my_tree.heading("Link", text="Link to Photos", anchor=W)
         # ------------------------------------------
 
         # query to get all order tuples from db in format (developer name, quantity, price, date placed, date delivered, link)
-        order_data = query.getOrderHistory(mydb, mycursor, Customer.id)
+        order_data = query.getCustomerOrderHistory(mydb, mycursor, Customer.id)
         # Add data to tree
         i = 0
         for record in order_data:
-            my_tree.insert(parent='', index='end', iid=i, values=order_data[i])
+            my_tree.insert(parent='', index='end', iid=i, values=record)
             i+=1
 
     def view_store():

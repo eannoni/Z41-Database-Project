@@ -159,7 +159,7 @@ class query:
     # for Customer
     def getCustomerOrderHistory(mydb, mycursor, custID):
         query = '''
-        SELECT Developer.Name, Quantity, Price, DatePlaced, DateDelivered, Link, Status
+        SELECT Developer.Name, Quantity, Price, DatePlaced, DateDelivered, Status, Link
         FROM FilmOrder
         INNER JOIN Developer
         ON FilmOrder.DeveloperID = Developer.DeveloperID
@@ -170,7 +170,7 @@ class query:
     # for Developer
     def getDeveloperOrderHistory(mydb, mycursor, devID):
         query = '''
-        SELECT Customer.Name, Quantity, Price, DatePlaced, DateDelivered, Link, Status
+        SELECT Customer.Name, Quantity, Price, DatePlaced, DateDelivered, Status, Link
         FROM FilmOrder
         INNER JOIN Customer
         ON FilmOrder.CustomerID = Customer.CustomerID
@@ -181,7 +181,7 @@ class query:
     # for Develoepr
     def getDeveloperCurrentOrders(mydb, mycursor, devID):
         query = '''
-        SELECT Developer.Name, Quantity, Price, DatePlaced, DateDelivered, Link, Status
+        SELECT Customer.Name, Quantity, Price, DatePlaced, DateDelivered, Status, Link
         FROM FilmOrder
         INNER JOIN Customer
         ON FilmOrder.CustomerID = Customer.CustomerID
