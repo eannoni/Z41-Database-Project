@@ -210,6 +210,7 @@ class Developer:
         Button(frame, text="Quit", command=root.quit).pack()
 
 
+
     def updateAvailRolls():
         clear_frame()
 
@@ -245,8 +246,10 @@ class Developer:
         Button(frame, text="Back", command=lambda: Developer.menu(Developer.id)).pack()
 
 
+
     def viewOrders():
         clear_frame()
+
 
         # ------ View Order Helper Functions ------
         def goOnClick():
@@ -256,8 +259,9 @@ class Developer:
             else:
                 displayOrders(tree_frame, True)
 
+
         def displayOrders(tree_frame, currentOrders):
-            # Clear treee frame before adding data
+            # Clear tree frame before adding data
             for widgets in tree_frame.winfo_children():
                 widgets.destroy()
 
@@ -266,47 +270,54 @@ class Developer:
             my_tree.pack()
 
             # Define our columns
-            my_tree['columns'] = ("DatePlaced", "DateDelivered", "DeveloperName", "Quantity", "Price", "Link")
+            my_tree['columns'] = ("CustomerName", "Quantity", "TotalPrice", "DatePlaced", "DateDelivered", "OrderStatus", "Link")
 
             # Format our columns
+            my_tree.column("#0", width=0, stretch=NO)
+            my_tree.column("CustomerName", anchor=CENTER, width=150)
+            my_tree.column("Quantity", anchor=CENTER, width=60)
+            my_tree.column("TotalPrice", anchor=CENTER, width=70)
             my_tree.column("DatePlaced", anchor=CENTER, width=140)
             my_tree.column("DateDelivered", anchor=CENTER, width=140)
-            my_tree.column("#0", width=0, stretch=NO)
-            my_tree.column("DeveloperName", anchor=W, width=250)
-            my_tree.column("Quantity", anchor=CENTER, width=60)
-            my_tree.column("Price", anchor=CENTER, width=70)
-            my_tree.column("Link", anchor=CENTER, width=350)
+            my_tree.column("OrderStatus", anchor=CENTER, width=140)
+            my_tree.column("Link", anchor=W, width=200)
 
             # Create headings
+            my_tree.heading("CustomerName", text="Customer Name", anchor=CENTER)
+            my_tree.heading("Quantity", text="Quantity", anchor=CENTER)
+            my_tree.heading("TotalPrice", text="Total Price", anchor=CENTER)
             my_tree.heading("DatePlaced", text="Date Placed", anchor=CENTER)
             my_tree.heading("DateDelivered", text="Date Delivered", anchor=CENTER)
-            my_tree.heading("DeveloperName", text="Developer Name", anchor=CENTER)
-            my_tree.heading("Quantity", text="Quantity", anchor=CENTER)
-            my_tree.heading("Price", text="Total Price", anchor=CENTER)
+            my_tree.heading("OrderStatus", text="Status", anchor=CENTER)
             my_tree.heading("Link", text="Link", anchor=W)
 
             # Query to get all product tuples from db in format (date, name, quantity, price)
             if currentOrders == True:
-                orderData = query.getCurrentOrders(mydb, mycursor, Customer.id)
+                order_data = query.getDeveloperCurrentOrders(mydb, mycursor, Developer.id)
             else:
-                orderData = query.getOrderHistory(mydb, mycursor, Customer.id)
+                order_data = query.getDeveloperOrderHistory(mydb, mycursor, Developer.id)
             
-            # Add data to tree
             i = 0
-            for record in orderData:
-                # total price = quantity * price
-                totalPrice = record[1] * record[2]
-                my_tree.insert(parent='', index='end', iid=i, values=(orderData[i][3], orderData[i][4],orderData[i][0], orderData[i][1], "$"+str(totalPrice),  orderData[i][5]))
+            for record in order_data:
+                my_tree.insert(parent='', index='end', iid=i, values=record)
                 i+=1
+
+
+        def changeStatus(selectedOrder):
+
+            query.updateOrderStatus(mydb, mycursor, selectedOrder.OrderID, text=clicked.get())
+
 
         # ------ View Order Page ------
         Label(frame, text="View Orders").pack()
 
-         # Radio buttons
+        # Radio buttons
         option = IntVar()
         option.set("All Orders")
         Radiobutton(frame, text="All Orders", variable=option, value=0).pack(anchor=CENTER)
         Radiobutton(frame, text="Current Orders", variable=option, value=1).pack(anchor=CENTER)
+
+        
 
         # View button
         viewOrderType = Button(frame, text="View", command=goOnClick)
@@ -315,6 +326,21 @@ class Developer:
         # Create treeview frame
         tree_frame = Frame(frame)
         tree_frame.pack(pady=10)
+
+        # Statuses dropdown
+        options = [
+            "PENDING",
+            "RECEIVED",
+            "DEVELOPED",
+            "SCANNED",
+            "SENT"
+        ]
+
+        clicked = StringVar()
+        drop = OptionMenu(frame, clicked, *options).pack()
+
+        # Change status button
+        Button(frame, text="Change Status", command=lambda: changeStatus(my_tree.selection)).pack(pady=20)
 
         # Back button
         Button(frame, text="Back", command=lambda: Developer.menu(Developer.id)).pack()
