@@ -156,23 +156,36 @@ class query:
         mycursor.execute(query)
         return mycursor.fetchall()
 
-    def getOrderHistory(mydb, mycursor, custID):
+    # for Customer
+    def getCustomerOrderHistory(mydb, mycursor, custID):
         query = '''
-        SELECT Developer.Name, Quantity, Price, DatePlaced, DateDelivered, Link
+        SELECT Developer.Name, Quantity, Price, DatePlaced, DateDelivered, Link, Status
         FROM FilmOrder
         INNER JOIN Developer
         ON FilmOrder.DeveloperID = Developer.DeveloperID
         WHERE CustomerID = ''' + str(custID) + " ORDER BY FilmOrder.DatePlaced DESC;"
         mycursor.execute(query)
         return mycursor.fetchall()
-    
-    def getCurrentOrders(mydb, mycursor, custID):
+
+    # for Developer
+    def getDeveloperOrderHistory(mydb, mycursor, devID):
         query = '''
-        SELECT Developer.Name, Quantity, Price, DatePlaced, DateDelivered, Link
+        SELECT Customer.Name, Quantity, Price, DatePlaced, DateDelivered, Link, Status
         FROM FilmOrder
-        INNER JOIN Developer
-        ON FilmOrder.DeveloperID = Developer.DeveloperID
-        WHERE CustomerID = ''' + str(custID) + " AND FilmOrder.Status != 'SENT' ORDER BY FilmOrder.DatePlaced DESC;"
+        INNER JOIN Customer
+        ON FilmOrder.CustomerID = Customer.CustomerID
+        WHERE DeveloperID = ''' + str(devID) + " ORDER BY FilmOrder.DatePlaced DESC;"
+        mycursor.execute(query)
+        return mycursor.fetchall()
+    
+    # for Develoepr
+    def getDeveloperCurrentOrders(mydb, mycursor, devID):
+        query = '''
+        SELECT Developer.Name, Quantity, Price, DatePlaced, DateDelivered, Link, Status
+        FROM FilmOrder
+        INNER JOIN Customer
+        ON FilmOrder.CustomerID = Customer.CustomerID
+        WHERE DeveloperID = ''' + str(devID) + " AND FilmOrder.Status != 'SENT' ORDER BY FilmOrder.DatePlaced DESC;"
         mycursor.execute(query)
         return mycursor.fetchall()
 
