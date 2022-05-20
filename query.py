@@ -89,12 +89,10 @@ class query:
         mycursor.execute(query)
         mydb.commit()
 
-    # UNTESTED
     def updateOrderStatus(mydb, mycursor, id, status):
         query = '''
         UPDATE FilmOrder
-        SET Status = ''' + str(status) + '''
-        WHERE OrderID = ''' + str(id) + ";"
+        SET Status = \'''' + status + "' WHERE OrderID = " + str(id) + ";"
         mycursor.execute(query)
         mydb.commit()
 
@@ -170,7 +168,7 @@ class query:
     # for Developer
     def getDeveloperOrderHistory(mydb, mycursor, devID):
         query = '''
-        SELECT Customer.Name, Quantity, Price, DatePlaced, DateDelivered, Status, Link
+        SELECT Customer.Name, Quantity, Price, DatePlaced, DateDelivered, Status, Link, OrderID
         FROM FilmOrder
         INNER JOIN Customer
         ON FilmOrder.CustomerID = Customer.CustomerID
@@ -178,10 +176,10 @@ class query:
         mycursor.execute(query)
         return mycursor.fetchall()
     
-    # for Develoepr
+    # for Developer
     def getDeveloperCurrentOrders(mydb, mycursor, devID):
         query = '''
-        SELECT Customer.Name, Quantity, Price, DatePlaced, DateDelivered, Status, Link
+        SELECT Customer.Name, Quantity, Price, DatePlaced, DateDelivered, Status, Link, OrderID
         FROM FilmOrder
         INNER JOIN Customer
         ON FilmOrder.CustomerID = Customer.CustomerID
