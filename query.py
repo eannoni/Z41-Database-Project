@@ -118,23 +118,30 @@ class query:
         mycursor.execute(query)
         return mycursor.fetchall()
 
-    # UNTESTED
-    def decrementAvailableRollsForDeveloper(mydb, mycursor, id, rollsToRemove):
-        mycursor.execute("SELECT AvailableRolls FROM Developer WHERE DeveloperID = " + str(id) + ";")
-        count = mycursor.fetchone()[0]
-        result = count - rollsToRemove
-        query = '''UPDATE Developer
-        SET AvailableRolls = ''' + str(result) + '''
-        WHERE DeveloperID = ''' + str(id) + ";"
-        mycursor.execute(query)
-        mydb.commit()
+    # transaction that subtracts quantity from available rolls for the developer and inserts new FilmOrder with given quantity
+    def createOrder(mydb, mycursor, custID, devID, datePlaced, quantity, price):
+        try:
+            # update developer's available rolls
+            update_query = '''
+            UPDATE Developer
+            SET AvailableRolls = AvailableRolls - ''' + str(quantity) + '''
+            WHERE DeveloperID = ''' + str(devID) + ''';
+            '''
+            mycursor.execute(update_query)
 
-    def createOrder(mydb, mycursor, custID, devID, datePlaced, Quantity, Price):
-        query = '''
-        INSERT INTO FilmOrder(CustomerID, DeveloperID, Status, DatePlaced, Quantity, Price)
-        VALUES(''' + str(custID) + ", " + str(devID) + ", 'PENDING', '" + str(datePlaced) + "', " + str(Quantity) + ", " + str(Price) + ");"
-        mycursor.execute(query)
-        mydb.commit()
+            # insert new FilmOrder
+            insert_query = '''
+            INSERT INTO FilmOrder(CustomerID, DeveloperID, Status, DatePlaced, Quantity, Price)
+            VALUES(''' + str(custID) + ", " + str(devID) + ", 'PENDING', '" + str(datePlaced) + "', " + str(quantity) + ", " + str(price) + ''');
+            '''
+            mycursor.execute(insert_query)
+
+            # commit changes
+            mydb.commit()
+        except:
+            print("Failed to execute query; rollback")
+            # revert changes
+            mydb.rollback()
 
     def createPurchase(mydb, mycursor, custID, prodID, date, quantity):
         query = '''

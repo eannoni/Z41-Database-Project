@@ -663,9 +663,7 @@ class Customer:
             cost_str = ("%.2f" % total_cost)
             decision = messagebox.askyesno("Product Purchase", "Are you sure you would like to have " + str(quantity) + " roll(s) developed by " + developer_tuple[1] + " for $" + cost_str + "?")
             if decision:
-                # query to decrement available rolls for developer in db
-                query.decrementAvailableRollsForDeveloper(mydb, mycursor, developer_id, quantity)
-                # query to create order in db
+                # transaction query to decrement available rolls for developer and create order in db
                 query.createOrder(mydb, mycursor, Customer.id, developer_id, get_curr_datetime(), quantity, total_cost)
                 # refresh developer tree view
                 refresh_developer_tree(quantity)
