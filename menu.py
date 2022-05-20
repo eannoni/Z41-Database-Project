@@ -209,8 +209,6 @@ class Developer:
         # Quit button
         Button(frame, text="Quit", command=root.quit).pack()
 
-
-
     def updateAvailRolls():
         clear_frame()
 
@@ -244,8 +242,6 @@ class Developer:
 
         # Back button
         Button(frame, text="Back", command=lambda: Developer.menu(Developer.id)).pack()
-
-
 
     def viewOrders():
         clear_frame()
@@ -307,8 +303,8 @@ class Developer:
         orderData = query.getDeveloperOrderHistory(mydb, mycursor, Developer.id)
         refresh_order_tree(option.get())
 
-        # changes status of selected order with value from dropdown
-        def changeStatus(selectedOrder):
+        # updates status of selected order with value from dropdown
+        def updateStatus(selectedOrder):
             # if nothing selected
             if len(selectedOrder) == 0:
                 messagebox.showerror("Change Status", "No order selected. Please select an order before attempting to edit.")
@@ -319,8 +315,21 @@ class Developer:
             query.updateOrderStatus(mydb, mycursor, orderID, newStatus)
             # refresh order tree view
             refresh_order_tree(option.get())
-            messagebox.showinfo("Change Status", "Successfully changed " + orderTuple[0] + "'s order status to '" + newStatus + "'.")
-        
+            messagebox.showinfo("Change Status", "Successfully updated " + orderTuple[0] + "'s order status to '" + newStatus + "'.")
+
+        def addLink(selectedOrder):
+            # if nothing selected
+            if len(selectedOrder) == 0:
+                messagebox.showerror("Change Status", "No order selected. Please select an order before attempting to edit.")
+                return
+            orderTuple = orderData[int(selectedOrder[0])]
+            orderID = orderTuple[7]
+            newLink = linkInput.get()
+            query.updateOrderLink(mydb, mycursor, orderID, newLink)
+            # refresh order tree view
+            refresh_order_tree(option.get())
+            messagebox.showinfo("Change Status", "Successfully updated " + orderTuple[0] + "'s link to receive their film.")
+
         # Create dropdown order status selection
         options = [
             "PENDING",
@@ -333,8 +342,20 @@ class Developer:
         drop = OptionMenu(frame, clicked, *options).pack()
         clicked.set("PENDING")
 
-        # Change Status button
-        Button(frame, text="Change Status", command=lambda: changeStatus(my_tree.selection())).pack()
+        # Update Status button
+        Button(frame, text="Update Order Status", command=lambda: updateStatus(my_tree.selection())).pack()
+
+        ttk.Separator(frame, orient=HORIZONTAL).pack(fill='x', pady=5)
+
+        # Add Link text entry field
+        Label(frame, text="Add Link to Film:").pack()
+        linkInput = Entry(frame, width=30)
+        linkInput.pack()
+
+        # Add Link button
+        Button(frame, text="Add Link", command=lambda: addLink(my_tree.selection())).pack()
+
+        ttk.Separator(frame, orient=HORIZONTAL).pack(fill='x', pady=5)
 
         # Back button
         Button(frame, text="Back", command=lambda: Developer.menu(Developer.id)).pack()

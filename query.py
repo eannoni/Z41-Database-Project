@@ -100,7 +100,7 @@ class query:
     def updateOrderLink(mydb, mycursor, id, link):
         query = '''
         UPDATE FilmOrder
-        SET Link = ''' + str(link) + '''
+        SET Link = \'''' + str(link) + '''\'
         WHERE OrderID = ''' + str(id) + ";"
         mycursor.execute(query)
         mydb.commit()
@@ -129,7 +129,6 @@ class query:
         mycursor.execute(query)
         mydb.commit()
 
-    # UNTESTED
     def createOrder(mydb, mycursor, custID, devID, datePlaced, Quantity, Price):
         query = '''
         INSERT INTO FilmOrder(CustomerID, DeveloperID, Status, DatePlaced, Quantity, Price)
