@@ -277,17 +277,17 @@ class Developer:
         button1.select()
         Radiobutton(frame, text="Current Orders", variable=option, value=1, command=lambda: refresh_order_tree(1)).pack(anchor=CENTER)
 
-        # Create dropdown order status selection
-        options = [
-            "PENDING",
-            "RECEIVED",
-            "DEVELOPED",
-            "SCANNED",
-            "SENT"
-        ]
-        clicked = StringVar()
-        drop = OptionMenu(frame, clicked, *options).pack()
-        clicked.set("PENDING")
+        # # Create dropdown order status selection
+        # options = [
+        #     "PENDING",
+        #     "RECEIVED",
+        #     "DEVELOPED",
+        #     "SCANNED",
+        #     "SENT"
+        # ]
+        # clicked = StringVar()
+        # drop = OptionMenu(frame, clicked, *options).pack()
+        # clicked.set("PENDING")
 
         # Create treeview frame
         tree_frame = Frame(frame)
@@ -333,8 +333,20 @@ class Developer:
             refresh_order_tree(option.get())
             messagebox.showinfo("Change Status", "Successfully changed " + orderTuple[0] + "'s order status to '" + newStatus + "'.")
         
+        # Create dropdown order status selection
+        options = [
+            "PENDING",
+            "RECEIVED",
+            "DEVELOPED",
+            "SCANNED",
+            "SENT"
+        ]
+        clicked = StringVar()
+        drop = OptionMenu(frame, clicked, *options).pack()
+        clicked.set("PENDING")
+
         # Change Status button
-        Button(frame, text="Change Status", command=lambda: changeStatus(my_tree.selection())).pack(pady=20)
+        Button(frame, text="Change Status", command=lambda: changeStatus(my_tree.selection())).pack()
 
         # Back button
         Button(frame, text="Back", command=lambda: Developer.menu(Developer.id)).pack()
