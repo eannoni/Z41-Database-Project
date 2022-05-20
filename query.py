@@ -17,7 +17,7 @@ class query:
         SELECT COUNT(*)
         FROM Customer
         WHERE CustomerID = '''
-        query += ID + ";"
+        query += ID + " AND isDeleted = 0;"
         mycursor.execute(query)
         count = mycursor.fetchone()[0]
         if count > 0:
@@ -47,7 +47,6 @@ class query:
         query += str(id) + ";"
         mycursor.execute(query)
         return mycursor.fetchone()
-        
 
     def updateCustomerAttributes(mydb, mycursor, id, name, email, address):
         query = '''
@@ -67,7 +66,8 @@ class query:
 
     def deleteCustomer(mydb, mycursor, id):
         query = '''
-        DELETE FROM Customer
+        UPDATE Customer
+        SET isDeleted = 1
         WHERE CustomerID = ''' + str(id) + ";"
         mycursor.execute(query)
         mydb.commit()
@@ -196,8 +196,15 @@ class query:
             ON Customer.CustomerID = Purchase.CustomerID
             INNER JOIN Product
             ON Purchase.ProductID = Product.ProductID
+            WHERE Customer.isDeleted = 0
             GROUP BY CustomerID
             HAVING SUM(Product.Price * Purchase.Quantity) >= 100
         ) AS PremiumCustomers;'''
+        mycursor.execute(query)
+        return mycursor.fetchall()
+
+    # used to generate csv report
+    def getAllDataFromTable(mydb, mycursor, table_name):
+        query = "SELECT * FROM " + table_name + ";"
         mycursor.execute(query)
         return mycursor.fetchall()

@@ -1,4 +1,5 @@
 # tkinter imports
+from ctypes import alignment
 from tkinter import *
 from tkinter import messagebox
 from tkinter import ttk
@@ -8,6 +9,7 @@ from database import database
 
 import sys
 import time
+import csv
 
 root = Tk()
 root.title("Z41 Demo")
@@ -36,20 +38,36 @@ def get_initialized_tree(tree_frame):
 
     return my_tree
 
-
+# writes data to csv file with given title name
+def write_csv(file_name, data):
+        csv.writer(open(file_name, 'w')).writerows(data)
 
 ##### ----------------- WELCOME -----------------
 class Welcome:
     # clears frame and populates
     def welcome():
         clear_frame()
-        Label(frame, text="Are you a Developer or a Customer?").pack()
-        Button(frame, text="Developer", command=Welcome.developer).pack()
-        Button(frame, text="Customer", command=Welcome.customer).pack()
+        account_frame = LabelFrame(frame, text="Select an Account Type")
+        account_frame.grid(row=0,column=0, sticky="NESW", padx=50, pady=5)
+        Label(account_frame, text="Are you a Developer or a Customer?").grid(row=0, column=0, columnspan=2)
+        Button(account_frame, text="Developer", command=Welcome.developer).grid(row=1, column=0)
+        Button(account_frame, text="Customer", command=Welcome.customer).grid(row=1, column=1)
+
         # View Premium Customers (Premium is purchase total of > $100)
-        Button(frame, text="View Premium Customers", command=Welcome.view_premium_customers).pack()
+        special_frame = LabelFrame(frame, text="Special Options")
+        special_frame.grid(row=0,column=1, sticky="NESW", padx=50, pady=5)
+        Button(special_frame, text="View Premium Customers", command=Welcome.view_premium_customers).grid(row=0, column=0)
+
+        # Generate report frame and buttons
+        reports_frame = LabelFrame(frame, text="Generate CSV Reports")
+        reports_frame.grid(row=0, column=2, sticky="NESW", padx=50, pady=5)
+        Button(reports_frame, text="Developers", command=lambda: Welcome.generate_report("Developer")).pack()
+        Button(reports_frame, text="Customers", command=lambda: Welcome.generate_report("Customer")).pack()
+        Button(reports_frame, text="Products", command=lambda: Welcome.generate_report("Product")).pack()
+        Button(reports_frame, text="Purchases", command=lambda: Welcome.generate_report("Purchase")).pack()
+        Button(reports_frame, text="Film Orders", command=lambda: Welcome.generate_report("FilmOrder")).pack()
         # Quit button
-        Button(frame, text="Quit", command=root.quit).pack()
+        Button(frame, text="Quit", command=root.quit).grid(row=1, column=0, columnspan=3)
 
 
     ##### Welcome functions for Developer
@@ -172,6 +190,17 @@ class Welcome:
 
         # Back button
         Button(frame, text="Back", command=Welcome.welcome).pack()
+
+    # Queries requested data and generates csv file, takes in table name
+    def generate_report(table_name):
+        # query data
+        data = query.getAllDataFromTable(mydb, mycursor, table_name)
+        file_name = "reports/" + table_name.lower() + "s.csv"
+        # write to file
+        write_csv(file_name, data)
+        # display success message
+        messagebox.showinfo("Generate Report", "Successfully generated report of all " + table_name + "s to '" + file_name + "'.")
+
 
 
 
