@@ -14,7 +14,8 @@ class database:
                 CustomerID INT AUTO_INCREMENT PRIMARY KEY,
                 Name VARCHAR(50) NOT NULL,
                 Email VARCHAR(62) NOT NULL,
-                Address VARCHAR(95) NOT NULL
+                Address VARCHAR(95) NOT NULL,
+                isDeleted BLOB DEFAULT (0)
             );
             ''',
             '''
