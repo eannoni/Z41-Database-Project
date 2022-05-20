@@ -277,18 +277,6 @@ class Developer:
         button1.select()
         Radiobutton(frame, text="Current Orders", variable=option, value=1, command=lambda: refresh_order_tree(1)).pack(anchor=CENTER)
 
-        # # Create dropdown order status selection
-        # options = [
-        #     "PENDING",
-        #     "RECEIVED",
-        #     "DEVELOPED",
-        #     "SCANNED",
-        #     "SENT"
-        # ]
-        # clicked = StringVar()
-        # drop = OptionMenu(frame, clicked, *options).pack()
-        # clicked.set("PENDING")
-
         # Create treeview frame
         tree_frame = Frame(frame)
         tree_frame.pack(pady=10)
