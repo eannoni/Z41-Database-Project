@@ -404,8 +404,8 @@ class Customer:
         option = IntVar()
         option.set("Purchases")
         # create radiobuttons
-        Radiobutton(frame, text="Purchases", variable=option, value=0).pack(anchor=W)
-        Radiobutton(frame, text="Orders", variable=option, value=1).pack(anchor=W)
+        Radiobutton(frame, text="Purchases", variable=option, value=0).pack(anchor=CENTER)
+        Radiobutton(frame, text="Orders", variable=option, value=1).pack(anchor=CENTER)
 
         def on_go_button_clicked():
             choice = option.get()
