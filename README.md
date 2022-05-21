@@ -15,3 +15,9 @@ Have mySQL set up on your computer, know your username and password.
 
 ## NOTES
 If not already set up, the tables for the database will be generated automatically, and if the tables are empty, sample data will be loaded in automatically. If the tables aren't empty, such as if you leave the app and come back, the previous changes will still be there. All you need to do to set up the database is run the app as instructed above with your mySQL username and password on the command line.
+
+
+## Deliverables
+- menu.py 
+- query.py 
+- database.py 
